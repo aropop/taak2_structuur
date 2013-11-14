@@ -13,7 +13,7 @@
 
 class QuestionList {
 public:
-	QuestionList(std::string filename);
+	QuestionList(std::string& filename);
 	~QuestionList();
 
 	void list();
@@ -26,10 +26,10 @@ public:
 
 
 private:
-	bool dirty_ = false;
+	bool dirty_;
 	std::string filename_;
-	Question questions_[];
-	unsigned char uuid_[];
+	Question * questions_;
+	uuid_t uuid_;
 
 
 	void read_from_file(std::ifstream * input_file);

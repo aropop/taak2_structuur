@@ -7,10 +7,25 @@
 
 #include "Question.h"
 
-Question::Question(int id, QuestionType type, std::string question,
-		std::string answers[]) :
+Question::Question(int id, QuestionType type, std::string& question,
+		std::string * answers) :
 		id_(id), type_(type), question_string_(question), answers_(answers) {
 
+}
+
+Question::Question(int id, QuestionType type, std::string& question) :
+		id_(id), type_(type), question_string_(question) {
+	answers_ = NULL;
+}
+
+Question::Question(void): answers_(NULL)  {
+
+}
+
+Question::~Question() {
+	if (answers_ != NULL) {
+		delete[] answers_;
+	}
 }
 
 void Question::set_question_string(std::string new_question) {
@@ -18,7 +33,11 @@ void Question::set_question_string(std::string new_question) {
 }
 
 void Question::set_answers(std::string answers[]) {
-	answers_ = answers;
+	if (type_ == CHOICE) {
+		answers_ = answers;
+	} else {
+		throw std::string("Cannot set answers for an not CHOICE question");
+	}
 }
 
 int Question::number_of_answers() {
