@@ -19,22 +19,23 @@ public:
 	};
 
 
-	Question(int id, QuestionType type, std::string& question, std::string * answers);
+	Question(int id, QuestionType type, std::string& question, std::string * answers, int amount_of_answers);
 	Question(int id, QuestionType type, std::string& question);
 	Question();
 	~Question();
-	void set_answers(std::string answers[]);
-	void set_question_string(std::string new_question);
+	void set_answers(std::string* answers);
+	void set_question_string(std::string& new_question);
 	std::string get_question_file_string();
 	static std::string get_type_string(QuestionType type);
 
+	bool copied;
 
 private:
 	int id_;
 	QuestionType type_;
 	std::string question_string_;
 	std::string * answers_;
-
+	int amount_of_answers_;
 	int number_of_answers();
 
 

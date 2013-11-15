@@ -8,40 +8,48 @@
 #include "Question.h"
 
 Question::Question(int id, QuestionType type, std::string& question,
-		std::string * answers) :
-		id_(id), type_(type), question_string_(question), answers_(answers) {
+		std::string * answers, int amount_of_answers) :
+		copied(false), id_(id), type_(type),  question_string_(question), answers_(answers), amount_of_answers_(
+				amount_of_answers) {
 
 }
 
 Question::Question(int id, QuestionType type, std::string& question) :
-		id_(id), type_(type), question_string_(question) {
+		copied(false), id_(id), type_(type), question_string_(question), amount_of_answers_(0) {
 	answers_ = NULL;
-}
-
-Question::Question(void): answers_(NULL)  {
 
 }
+
+Question::Question(void) : copied(false),
+		answers_(NULL) {
+
+}
+
 
 Question::~Question() {
-	if (answers_ != NULL) {
+	if (answers_ != NULL && !copied) {
 		delete[] answers_;
+		//is niet gekopieerd dus niet zijn verantwoordelijkheid
 	}
 }
 
-void Question::set_question_string(std::string new_question) {
+void Question::set_question_string(std::string& new_question) {
 	question_string_ = new_question;
 }
 
-void Question::set_answers(std::string answers[]) {
+void Question::set_answers(std::string * answers) {
 	if (type_ == CHOICE) {
+		delete[] answers_;
 		answers_ = answers;
 	} else {
 		throw std::string("Cannot set answers for an not CHOICE question");
 	}
 }
 
+
+
 int Question::number_of_answers() {
-	return 0;
+	return amount_of_answers_;
 }
 
 std::string Question::get_type_string(Question::QuestionType type) {
