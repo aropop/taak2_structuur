@@ -11,6 +11,7 @@
 #define QUESTION_H_
 
 
+
 class Question {
 public:
 	enum QuestionType {
@@ -26,7 +27,9 @@ public:
 	void set_answers(std::string* answers);
 	void set_question_string(std::string& new_question);
 	std::string get_question_file_string();
+	std::string get_string();
 	static std::string get_type_string(QuestionType type);
+
 
 	bool copied;
 
@@ -40,5 +43,7 @@ private:
 
 
 };
+
+std::ostream& operator<< (std::ostream& out, Question& q);
 
 #endif /* QUESTION_H_ */

@@ -38,7 +38,7 @@ QuestionList::~QuestionList(void){
 
 void QuestionList::list(std::ostream * out) {
 	for (int i = 0; i < amount_of_questions_; ++i) {
-		*out << questions_[i].get_question_file_string().c_str();
+		*out << questions_[i] << std::endl;
 	}
 }
 
@@ -134,11 +134,13 @@ void QuestionList::read_from_file(std::ifstream * input_file) {
 					Question current_question (question_number,
 							Question::CHOICE, question_string, answers, amount_of_answers);
 					questions_[question_number - 1] = current_question;
+					//scope zal de current_question destructen maar we hebben ze gekopieerd naar het geheugen
+					current_question.copied = true;
 				} else if (question_type.compare(
 						Question::get_type_string(Question::TEXT)) == 0) {
 					ss.ignore();
 					getline(ss, question_string);
-					//moet alleen vraag uitlezen en question object aanmake
+					//moet alleen vraag uitlezen en question object aanmaken
 					Question current_question (question_number,
 							Question::TEXT, question_string);
 

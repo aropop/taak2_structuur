@@ -6,25 +6,26 @@
  */
 
 #include "Question.h"
+#include <iostream>
 
 Question::Question(int id, QuestionType type, std::string& question,
 		std::string * answers, int amount_of_answers) :
-		copied(false), id_(id), type_(type),  question_string_(question), answers_(answers), amount_of_answers_(
-				amount_of_answers) {
+		copied(false), id_(id), type_(type), question_string_(question), answers_(
+				answers), amount_of_answers_(amount_of_answers) {
 
 }
 
 Question::Question(int id, QuestionType type, std::string& question) :
-		copied(false), id_(id), type_(type), question_string_(question), amount_of_answers_(0) {
+		copied(false), id_(id), type_(type), question_string_(question), amount_of_answers_(
+				0) {
 	answers_ = NULL;
 
 }
 
-Question::Question(void) : copied(false),
-		answers_(NULL) {
+Question::Question(void) :
+		copied(false), answers_(NULL) {
 
 }
-
 
 Question::~Question() {
 	if (answers_ != NULL && !copied) {
@@ -45,8 +46,6 @@ void Question::set_answers(std::string * answers) {
 		throw std::string("Cannot set answers for an not CHOICE question");
 	}
 }
-
-
 
 int Question::number_of_answers() {
 	return amount_of_answers_;
@@ -85,4 +84,26 @@ std::string Question::get_question_file_string() {
 	}
 	return file_stringstream.str();
 }
+
+
+std::string Question::get_string(){
+	//string stream om gemakkelijk te werken
+	std::stringstream file_stringstream;
+	//standaard gedeelte invullen
+	file_stringstream << id_ << " " << Question::get_type_string(type_) << " ";
+	//specifiek gedeelte
+	if (type_ == Question::CHOICE) {
+		file_stringstream << number_of_answers() << " ";
+	}
+	//vraag toevoegen
+	file_stringstream << question_string_;
+	return file_stringstream.str();
+
+}
+std::ostream& operator<<(std::ostream& out, Question& q){
+	out << q.get_string();
+	return out;
+}
+
+
 

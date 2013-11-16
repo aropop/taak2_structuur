@@ -100,6 +100,7 @@ void Parser::parse_dispatch() {
 }
 
 std::string* Parser::prompt_for_choices() {
+	//todo fix error when more than 5 answers
 	int array_size(5), amount_of_answers(0);
 	std::string * answers = new std::string[array_size];
 	std::string current_read;
