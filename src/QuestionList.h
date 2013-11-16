@@ -16,16 +16,21 @@ public:
 	QuestionList(std::string& filename);
 	~QuestionList();
 
+	//commando's
 	void list(std::ostream * out);
 	int add(Question::QuestionType type, std::string& question_string,
 			std::string *answers, int amount_of_answers);
 	int add(Question::QuestionType type, std::string& question_string,
 			std::string *answers, int amount_of_answers, int position);
-	void edit(int question_number, std::string new_question_string);
-	void edit_choice(int question_number, std::string new_answers[]);
+	void edit(int question_number, std::string& new_question_string);
+	void edit_choice(int question_number, std::string* new_answers);
 	void delete_question(int question_number);
 	void save();
+
+	//hulp
 	bool dirty;
+	bool in_range(int position);
+	std::string get_question_string(int index);
 
 private:
 	std::string filename_;

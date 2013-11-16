@@ -29,17 +29,19 @@ public:
 	std::string get_question_file_string();
 	std::string get_string();
 	static std::string get_type_string(QuestionType type);
+	int increase_id();
+	int decrease_id();
 
 
+	std::string question_string;
 	bool copied;
 
 private:
 	int id_;
 	QuestionType type_;
-	std::string question_string_;
 	std::string * answers_;
 	int amount_of_answers_;
-	int number_of_answers();
+	const int number_of_answers();
 
 
 };

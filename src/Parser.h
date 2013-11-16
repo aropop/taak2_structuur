@@ -31,8 +31,15 @@ private:
 	int current_amount_of_answers_;
 
 	std::string * prompt_for_choices();
+	std::string prompt_for_new_question_string(int index);
+
 	void parse_dispatch();
 	bool prompt_save();
+
+	inline void reset_parser_code();
+
+	const inline void print_add_text(std::string& question, int position);
+	const inline void print_out_of_bounds(int index);
 };
 
 #endif /* PARSER_H_ */

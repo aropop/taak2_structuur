@@ -31,9 +31,9 @@ QuestionList::QuestionList(std::string& filename) :
 
 }
 
-QuestionList::~QuestionList(void){
+QuestionList::~QuestionList(void) {
 	//verwijder de questions
-	delete [] questions_;
+	delete[] questions_;
 }
 
 void QuestionList::list(std::ostream * out) {
@@ -43,37 +43,62 @@ void QuestionList::list(std::ostream * out) {
 }
 
 int QuestionList::add(Question::QuestionType type, std::string& question_string,
-		 std::string *answers, int amount_of_answers,  int position) {
+		std::string *answers, int amount_of_answers, int position) {
 	Question* old_questions(questions_);
 	int index(0);
 	bool skipped(false);
 	questions_ = new Question[amount_of_questions_ + 1];
-	while(index < (amount_of_questions_ + 1)){
-		if(index == (position - 1)){
-			questions_[index] = Question(index + 1, type, question_string, answers, amount_of_answers);
-		}else{
-			if(skipped){
-				questions_[index + 1] = old_questions[index];
-			}else {
+	while (index < (amount_of_questions_ + 1)) {
+		if (index == (position - 1)) {
+			questions_[index] = Question(index + 1, type, question_string,
+					answers, amount_of_answers);
+			skipped = true;
+		} else {
+			if (skipped) {
+				questions_[index] = old_questions[index - 1]; //index loopt gewoon door dus moet je 1 achteruit in de oude kijken
+				questions_[index].increase_id();
+				old_questions[index - 1].copied = true;
+			} else {
 				questions_[index] = old_questions[index];
+				old_questions[index].copied = true;
 			}
 			//we moet de antwoorden niet verwijderen want dat zou een probleem zijn
-			old_questions[index].copied = true;
 		}
 		index++;
 	}
 	amount_of_questions_++;
 	dirty = true;
-	delete [] old_questions;
+	delete[] old_questions;
 	return position;
 }
 
-int QuestionList::add(Question::QuestionType type, std::string& question_string, std::string *answers, int amount_of_answers) {
-	return add(type, question_string, answers, amount_of_answers, amount_of_questions_ + 1);
+int QuestionList::add(Question::QuestionType type, std::string& question_string,
+		std::string *answers, int amount_of_answers) {
+	return add(type, question_string, answers, amount_of_answers,
+			amount_of_questions_ + 1);
 }
 
 void QuestionList::save() {
 
+	dirty = false;
+}
+
+bool QuestionList::in_range(int position) {
+	return ((0 < position) && (position < (amount_of_questions_ + 1)));
+}
+
+std::string QuestionList::get_question_string(int index) {
+	return questions_[index].question_string;
+}
+
+void QuestionList::edit(int question_number, std::string& new_question_string) {
+	questions_[question_number].set_question_string(new_question_string);
+	dirty = true;
+}
+
+void QuestionList::edit_choice(int question_number, std::string* new_answers) {
+	questions_[question_number].set_answers(new_answers);
+	dirty = true;
 }
 
 void QuestionList::read_from_file(std::ifstream * input_file) {
@@ -131,8 +156,8 @@ void QuestionList::read_from_file(std::ifstream * input_file) {
 						getline(*input_file, answers[i]);
 					}
 					//maak de vraag aan
-					Question current_question (question_number,
-							Question::CHOICE, question_string, answers, amount_of_answers);
+					Question current_question(question_number, Question::CHOICE,
+							question_string, answers, amount_of_answers);
 					questions_[question_number - 1] = current_question;
 					//scope zal de current_question destructen maar we hebben ze gekopieerd naar het geheugen
 					current_question.copied = true;
@@ -141,8 +166,8 @@ void QuestionList::read_from_file(std::ifstream * input_file) {
 					ss.ignore();
 					getline(ss, question_string);
 					//moet alleen vraag uitlezen en question object aanmaken
-					Question current_question (question_number,
-							Question::TEXT, question_string);
+					Question current_question(question_number, Question::TEXT,
+							question_string);
 
 					questions_[question_number - 1] = current_question;
 
