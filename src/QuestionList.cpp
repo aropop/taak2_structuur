@@ -96,9 +96,43 @@ void QuestionList::edit(int question_number, std::string& new_question_string) {
 	dirty = true;
 }
 
-void QuestionList::edit_choice(int question_number, std::string* new_answers) {
-	questions_[question_number].set_answers(new_answers);
+void QuestionList::edit_choice(int question_number, std::string* new_answers, int amount) {
+	questions_[question_number].set_answers(new_answers, amount);
 	dirty = true;
+}
+
+int QuestionList::getAmountOfQuestions() const {
+	return amount_of_questions_;
+}
+
+void QuestionList::delete_question(int question_number) {
+	Question * new_question_mem = new Question[amount_of_questions_ - 1];
+	bool passed(false);
+	for (int i = 0; i < amount_of_questions_; ++i) {
+		if(i == question_number){
+			//skips copying this question
+			passed = true;
+		}else{
+			if(passed){
+				//has skipped the deleted one
+				new_question_mem[i - 1] = questions_[i];
+				//copied so don't delete answers array
+				questions_[i].copied = true;
+				//decrease id
+				new_question_mem[i - 1].decrease_id();
+			}else{
+				//hasn't skipped the deleted one
+				new_question_mem[i] = questions_[i];
+				questions_[i].copied = true;
+			}
+		}
+	}
+	//delete old questions
+	delete [] questions_;
+	//set new questions
+	questions_ = new_question_mem;
+	//het aantal questions daalt met 1
+	amount_of_questions_--;
 }
 
 void QuestionList::read_from_file(std::ifstream * input_file) {

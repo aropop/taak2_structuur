@@ -24,7 +24,7 @@ public:
 	Question(int id, QuestionType type, std::string& question);
 	Question();
 	~Question();
-	void set_answers(std::string* answers);
+	void set_answers(std::string* answers, int amount);
 	void set_question_string(std::string& new_question);
 	std::string get_question_file_string();
 	std::string get_string();

@@ -23,7 +23,7 @@ public:
 	int add(Question::QuestionType type, std::string& question_string,
 			std::string *answers, int amount_of_answers, int position);
 	void edit(int question_number, std::string& new_question_string);
-	void edit_choice(int question_number, std::string* new_answers);
+	void edit_choice(int question_number, std::string* new_answers, int amount);
 	void delete_question(int question_number);
 	void save();
 
@@ -31,6 +31,9 @@ public:
 	bool dirty;
 	bool in_range(int position);
 	std::string get_question_string(int index);
+	int getAmountOfQuestions() const;
+
+
 
 private:
 	std::string filename_;

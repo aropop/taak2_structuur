@@ -40,12 +40,13 @@ void Question::set_question_string(std::string& new_question) {
 }
 
 //veranderd de pointer van de antwoorden
-void Question::set_answers(std::string * answers) {
+void Question::set_answers(std::string * answers, int amount) {
 	if (type_ == CHOICE) {
 		delete[] answers_;
 		answers_ = answers;
+		amount_of_answers_ = amount;
 	} else {
-		throw std::string("Cannot set answers for an not CHOICE question");
+		throw std::string("Kan de antwoorden van een CHOICE vraag niet aanpassen!");
 	}
 }
 

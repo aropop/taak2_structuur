@@ -10,7 +10,6 @@
 #include "Parser.h"
 #include "QuestionList.h" //QuestionList
 #include "Question.h" //QuestionTypes
-
 //variabelen initialiseren en parse loop starten
 Parser::Parser(std::istream * in, std::ostream * out, QuestionList * ql) :
 		in_(in), out_(out), ql_(ql) {
@@ -130,14 +129,41 @@ void Parser::parse_dispatch() {
 			int index;
 			ss >> ignore;
 			ss >> index;
-			if(ql_->in_range(index)){
+			if (ql_->in_range(index)) {
 				//answers vragen en choices aanpassen
-				std::string * answers =  prompt_for_choices();
-				ql_->edit_choice(index - 1, answers); //-1 is het verschil tussen vraag nummer en index nummer
-			}else{
+				*out_ << "Nieuwe antwoorden voor vraag 2 ("
+						<< ql_->get_question_string(index - 1) << ")"
+						<< std::endl;
+				std::string * answers = prompt_for_choices();
+				//edit zou een error kunnen throwen wanneer dit een choice is
+				try {
+					ql_->edit_choice(index - 1, answers,
+							current_amount_of_answers_); //-1 is het verschil tussen vraag nummer en index nummer
+					*out_ << "Antwoorden voor vraag " << index << " aangepast."
+							<< std::endl;
+				} catch (std::string& e) {
+					//de error gewoon printen
+					*out_ << e << std::endl;
+				}
+			} else {
 				//out of bounds error printen
 				print_out_of_bounds(index);
 			}
+		}
+
+	} else if (command.compare("remove") == 0) {
+		//remove commando
+		int index;
+		ss >> index;
+		//out of bounds
+		if(ql_->in_range(index)){
+			//text vragen voor verwijderen
+			std::string text(ql_->get_question_string(index - 1));
+			ql_->delete_question(index - 1);
+			*out_ << "Vraag " << index << " (" << text << ") verwijderd." << std::endl;
+		}else{
+			//error weergeven
+			print_out_of_bounds(index);
 		}
 
 	} else if (command.compare("exit") == 0) {
@@ -237,6 +263,6 @@ const inline void Parser::print_add_text(std::string& question, int position) {
 }
 
 inline const void Parser::print_out_of_bounds(int index) {
-	*out_ << "Positie " << index << " is niet binnen het bereik" << std::endl;
+	*out_ << "Ongeldige invoer ("  << index << "), N=" << ql_->getAmountOfQuestions() << std::endl;
 }
 
