@@ -18,6 +18,8 @@ QuestionList::QuestionList(std::string& filename) :
 	if (!input_file) {
 		//bestand bestaat niet
 		uuid_generate(uuid_);
+		amount_of_questions_ = 0;
+		questions_ = NULL;
 	} else {
 		//probeer te lezen van bestand
 		try {

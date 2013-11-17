@@ -14,6 +14,7 @@
 
 class Question {
 public:
+
 	enum QuestionType {
 		CHOICE,
 		TEXT
@@ -24,16 +25,21 @@ public:
 	Question(int id, QuestionType type, std::string& question);
 	Question();
 	~Question();
+
 	void set_answers(std::string* answers, int amount);
 	void set_question_string(std::string& new_question);
+
 	std::string get_question_file_string();
 	std::string get_string();
+
 	static std::string get_type_string(QuestionType type);
+
 	int increase_id();
 	int decrease_id();
 
 
 	std::string question_string;
+
 	bool copied;
 
 private:

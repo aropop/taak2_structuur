@@ -12,7 +12,7 @@
 int main(int argc, char * args[]){
 
 
-	std::string fn ("src/vragen.ens");
+	std::string fn (args[1]); //bestandsnaam nemen
 	QuestionList ql = QuestionList(fn);
 	Parser p(&std::cin, &std::cout, &ql);
 	return 0;
