@@ -11,10 +11,13 @@
 #include <fstream>
 #include <uuid/uuid.h>
 
+
 QuestionList::QuestionList(std::string& filename) :
 		filename_(filename) {
+	//ifstream opbouwen
 	std::ifstream input_file(filename_.c_str());
 	dirty = false;
+	//verschil tussen een bestaand bestand en een niet bestaand bestand
 	if (!input_file) {
 		//bestand bestaat niet
 		uuid_generate(uuid_);
@@ -28,6 +31,7 @@ QuestionList::QuestionList(std::string& filename) :
 			//fout in bestand
 			std::cout << e << std::endl;
 		}
+		//file sluiten
 		input_file.close();
 	}
 
@@ -38,91 +42,118 @@ QuestionList::~QuestionList(void) {
 	delete[] questions_;
 }
 
+//list commando
 void QuestionList::list(std::ostream * out) {
+	//over vragen lopen en ze uitprinten
 	for (int i = 0; i < amount_of_questions_; ++i) {
 		*out << questions_[i] << std::endl;
 	}
 }
 
+//add commando met een positie
 int QuestionList::add(Question::QuestionType type, std::string& question_string,
 		std::string *answers, int amount_of_answers, int position) {
+	//pointer bij houden naaar het oudestuk geheugen
 	Question* old_questions(questions_);
+	//hulp variabelen
 	int index(0);
 	bool skipped(false);
+	//nieuw stuk geheugen alloceren
 	questions_ = new Question[amount_of_questions_ + 1];
+	//over de vragen lopen
 	while (index < (amount_of_questions_ + 1)) {
+		//vraag moet ingevoegd worden
 		if (index == (position - 1)) {
 			Question q = Question(index + 1, type, question_string,
 					answers, amount_of_answers);
 			questions_[index] = q;
+			//ervoor zorgen dat de destructor de antwoorden niet dealloceert
 			q.copied = true;
+			//we hebben een index geskipped in de oude array
 			skipped = true;
 		} else {
 			if (skipped) {
 				questions_[index] = old_questions[index - 1]; //index loopt gewoon door dus moet je 1 achteruit in de oude kijken
-				questions_[index].increase_id();
+				questions_[index].increase_id(); //vragen moeten nu een nummer hoger hebben
 				old_questions[index - 1].copied = true;
 			} else {
 				questions_[index] = old_questions[index];
+			//we moet de antwoorden niet verwijderen want dat zou een probleem zijn
 				old_questions[index].copied = true;
 			}
-			//we moet de antwoorden niet verwijderen want dat zou een probleem zijn
 		}
 		index++;
 	}
 	amount_of_questions_++;
 	dirty = true;
+	//oude vragen dealloceren
 	delete[] old_questions;
+	//positie terug geven voor het antwoord op het commando
 	return position;
 }
 
+//overloaden om add zonder positie mogelijk te maken
 int QuestionList::add(Question::QuestionType type, std::string& question_string,
 		std::string *answers, int amount_of_answers) {
 	return add(type, question_string, answers, amount_of_answers,
 			amount_of_questions_ + 1);
 }
+
+//hulp functie die uuid omzet
 std::string uuid_to_string(char * character_array){
 	std::string uuid_string;
 	uuid_string.append(character_array, 36);
 	return uuid_string;
 }
 
+//save commando
 void QuestionList::save() {
+	//output file openen
 	std::ofstream output_file(filename_.c_str());
 	char uuid_str[36];
 	uuid_unparse(uuid_, uuid_str);
+	//header wegschrijven
 	output_file << "VERSION 1" << std::endl << "ID " << uuid_to_string(uuid_str)
 			<< std::endl << "STEPS " << amount_of_questions_ << std::endl;
+	//vragen wegschrijven
 	for (int i = 0; i < amount_of_questions_; ++i) {
 		output_file << questions_[i].get_question_file_string();
 	}
+	//sluiten
 	output_file.close();
+	//ql is niet meer dirty want is juist weggeschreven
 	dirty = false;
 }
 
+//hulp functie die zegt of een bepaalde positie binnen het bereik ligt
 bool QuestionList::in_range(int position) {
 	return ((0 < position) && (position < (amount_of_questions_ + 1)));
 }
 
+//geeft de question string door
 std::string QuestionList::get_question_string(int index) {
 	return questions_[index].question_string;
 }
 
+//edit commando voor question strings
 void QuestionList::edit(int question_number, std::string& new_question_string) {
 	questions_[question_number].set_question_string(new_question_string);
 	dirty = true;
 }
 
+//edit commando voor choices
 void QuestionList::edit_choice(int question_number, std::string* new_answers,
 		int amount) {
 	questions_[question_number].set_answers(new_answers, amount);
 	dirty = true;
 }
 
+//getter voor amount of questions
 int QuestionList::getAmountOfQuestions() const {
 	return amount_of_questions_;
 }
 
+//delete commando
 void QuestionList::delete_question(int question_number) {
 	Question * new_question_mem = new Question[amount_of_questions_ - 1];
 	bool passed(false);
@@ -153,6 +184,7 @@ void QuestionList::delete_question(int question_number) {
 	amount_of_questions_--;
 }
 
+//functie die het bestand uitleest en het object invult
 void QuestionList::read_from_file(std::ifstream * input_file) {
 	std::stringstream ss;
 	std::string current_line, current_identifier;

@@ -18,13 +18,18 @@ public:
 
 	//commando's
 	void list(std::ostream * out);
+
 	int add(Question::QuestionType type, std::string& question_string,
 			std::string *answers, int amount_of_answers);
 	int add(Question::QuestionType type, std::string& question_string,
 			std::string *answers, int amount_of_answers, int position);
+
 	void edit(int question_number, std::string& new_question_string);
+
 	void edit_choice(int question_number, std::string* new_answers, int amount);
+
 	void delete_question(int question_number);
+
 	void save();
 
 	//hulp
@@ -42,6 +47,7 @@ private:
 
 	int amount_of_questions_;
 
+	//hulp
 	void read_from_file(std::ifstream * input_file);
 	void write_to_file();
 
