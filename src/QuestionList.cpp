@@ -50,8 +50,10 @@ int QuestionList::add(Question::QuestionType type, std::string& question_string,
 	questions_ = new Question[amount_of_questions_ + 1];
 	while (index < (amount_of_questions_ + 1)) {
 		if (index == (position - 1)) {
-			questions_[index] = Question(index + 1, type, question_string,
+			Question q = Question(index + 1, type, question_string,
 					answers, amount_of_answers);
+			questions_[index] = q;
+			q.copied = true;
 			skipped = true;
 		} else {
 			if (skipped) {
@@ -77,9 +79,22 @@ int QuestionList::add(Question::QuestionType type, std::string& question_string,
 	return add(type, question_string, answers, amount_of_answers,
 			amount_of_questions_ + 1);
 }
+std::string uuid_to_string(char * character_array){
+	std::string uuid_string;
+	uuid_string.append(character_array, 36);
+	return uuid_string;
+}
 
 void QuestionList::save() {
-
+	std::ofstream output_file(filename_.c_str());
+	char uuid_str[36];
+	uuid_unparse(uuid_, uuid_str);
+	output_file << "VERSION 1" << std::endl << "ID " << uuid_to_string(uuid_str)
+			<< std::endl << "STEPS " << amount_of_questions_ << std::endl;
+	for (int i = 0; i < amount_of_questions_; ++i) {
+		output_file << questions_[i].get_question_file_string();
+	}
+	output_file.close();
 	dirty = false;
 }
 
@@ -96,7 +111,8 @@ void QuestionList::edit(int question_number, std::string& new_question_string) {
 	dirty = true;
 }
 
-void QuestionList::edit_choice(int question_number, std::string* new_answers, int amount) {
+void QuestionList::edit_choice(int question_number, std::string* new_answers,
+		int amount) {
 	questions_[question_number].set_answers(new_answers, amount);
 	dirty = true;
 }
@@ -109,18 +125,18 @@ void QuestionList::delete_question(int question_number) {
 	Question * new_question_mem = new Question[amount_of_questions_ - 1];
 	bool passed(false);
 	for (int i = 0; i < amount_of_questions_; ++i) {
-		if(i == question_number){
+		if (i == question_number) {
 			//skips copying this question
 			passed = true;
-		}else{
-			if(passed){
+		} else {
+			if (passed) {
 				//has skipped the deleted one
 				new_question_mem[i - 1] = questions_[i];
 				//copied so don't delete answers array
 				questions_[i].copied = true;
 				//decrease id
 				new_question_mem[i - 1].decrease_id();
-			}else{
+			} else {
 				//hasn't skipped the deleted one
 				new_question_mem[i] = questions_[i];
 				questions_[i].copied = true;
@@ -128,7 +144,7 @@ void QuestionList::delete_question(int question_number) {
 		}
 	}
 	//delete old questions
-	delete [] questions_;
+	delete[] questions_;
 	//set new questions
 	questions_ = new_question_mem;
 	//het aantal questions daalt met 1
@@ -161,8 +177,9 @@ void QuestionList::read_from_file(std::ifstream * input_file) {
 			ss >> amount_of_questions_;
 			//nieuwe questions array aanmaken op de heap
 			questions_ = new Question[amount_of_questions_];
+			int counter(1);
 			//deze dan verder invullen
-			while (!(*input_file).eof()) {
+			while (amount_of_questions_ >= counter) {
 
 				getline(*input_file, current_line);
 				ss.clear();
@@ -211,6 +228,7 @@ void QuestionList::read_from_file(std::ifstream * input_file) {
 					//kent het question type niet
 					throw std::string("Unknown question type");
 				}
+				counter++;
 
 			}
 

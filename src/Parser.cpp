@@ -181,6 +181,7 @@ void Parser::parse_dispatch() {
 		if (ql_->dirty) {
 			ql_->save();
 		}
+		*out_ << "Bestand bewaard."	<< std::endl;
 	} else {
 		//verkeerde message
 		parser_code_ = WRONG_MESSAGE;
